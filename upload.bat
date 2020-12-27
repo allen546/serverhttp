@@ -1,4 +1,4 @@
-@git commit -am %*
+@git commit -am "Release"
 @git push origin master
 @python setup.py sdist bdist_wheel
 @set TWINE_USERNAME=haha1234346364
