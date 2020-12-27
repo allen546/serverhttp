@@ -4,7 +4,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="serverhttp", 
-    version="1.4.2",
+    version="1.4.3",
     author="Allen",
     author_email="allen.haha@hotmail.com",
     description="A simple HTTP server",

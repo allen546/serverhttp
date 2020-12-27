@@ -1,1 +1,1 @@
-version = 'python-httpserver/1.4.2'
+version = 'python-httpserver/1.4.3'
