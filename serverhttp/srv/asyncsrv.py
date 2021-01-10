@@ -9,7 +9,7 @@ import uuid
 from io import StringIO
 import traceback, sys
 if float(sys.version[:3]) < 3.7:
-    raise DeprecationWarning('python version not supported')
+    raise DeprecationWarning('python {} deprecated'.format(sys.version[:5]))
 import asyncio
 
 class AsyncHTTPServer:
@@ -95,13 +95,16 @@ class AsyncHTTPServer:
             else:
                 res = Response('500 Server Error', 'text/plain', '500 server error')
         return res
-    def serve_forever(self, host, port):
+    def init(self):
         loop = asyncio.get_event_loop()
         coro = asyncio.start_server(
             self._serve_one_client, 
             host=host, port=port, loop=loop, 
             ssl=self.sslcontext)
         srv = loop.run_until_complete(coro)
+        return srv, loop
+    def serve_forever(self, host, port):
+        srv, loop = self.init()
         if self.name:
             print('* Serving App {}'.format(self.name))
         print('* Serving On http://{host}:{port}'.format(host=host, port=port))

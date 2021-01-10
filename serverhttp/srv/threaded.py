@@ -105,5 +105,6 @@ class ThreadedHTTPServer:
                 threads_append(t)
                 t.start()
         except:
+            s.close()
             return
 
