@@ -6,6 +6,7 @@ serverhttp/example.py
 serverhttp.egg-info/PKG-INFO
 serverhttp.egg-info/SOURCES.txt
 serverhttp.egg-info/dependency_links.txt
+serverhttp.egg-info/requires.txt
 serverhttp.egg-info/top_level.txt
 serverhttp/http_support/__init__.py
 serverhttp/http_support/environ.py

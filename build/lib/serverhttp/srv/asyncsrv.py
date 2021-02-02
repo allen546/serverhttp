@@ -25,7 +25,7 @@ class AsyncHTTPServer:
     """
     Async HTTP Server.
     Note: AsyncHTTPServer Only supported on python 3.3 and above. 
-    For python 3.3-3.6, you'll need to install asyncio from PyPI.
+    For python 3.3, you'll need to install asyncio from PyPI.
     Usage:
     >>> from serverhttp import *
     >>> app = App(__name__)
