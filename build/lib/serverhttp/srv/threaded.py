@@ -1,3 +1,7 @@
+"""
+Threaded HTTP Server.
+"""
+
 import datetime, time, threading
 from ..http_support.request_parsing import Request
 from ..http_support.responses import Response
@@ -9,6 +13,19 @@ import uuid
 from io import StringIO
 import traceback
 class ThreadedHTTPServer:
+    """
+    Threaded HTTP Server.
+    Usage:
+    >>> from serverhttp import *
+    >>> app = App(__name__)
+    >>> @coroutine
+    @app.route("/", ["GET"])
+    def test(environ):
+        yield Response("200 OK")
+
+    >>> s = ThreadedHTTPServer(app=app)
+    >>> s.serve_forever("127.0.0.1", 60000)
+    """
     def __init__(self, name='', app=None, max_threads=2000, debug=False, sslcontext=None):
         self.server = version
         self.functions = {}
@@ -105,5 +122,6 @@ class ThreadedHTTPServer:
                 threads_append(t)
                 t.start()
         except:
+            s.close()
             return
 
