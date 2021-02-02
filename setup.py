@@ -15,6 +15,6 @@ setuptools.setup(
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
     ],
-    install_requires=["asyncio"]
+    install_requires=["asyncio"],
     python_requires='>=3.3',
 )
