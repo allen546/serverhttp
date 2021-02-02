@@ -7,10 +7,13 @@ class Response(object):
         self.data = data
         self.server = servername
         self.location = location
-        self.cookies = ';'.join(key+'='+obj for key, obj in cookies.items())
+        if cookies is not None:
+            self.cookies = ';'.join(key+'='+obj for key, obj in cookies.items())
+        else:
+            self.cookies = ''
     def __str__(self):
         if len(self.cookies)!=0:
-            cookies = 'Set-Cookie: {}'.format(self.cookies)
+            cookies = 'Set-Cookie: {}'.format(self.cookies)+"\r\n"
         else:
             cookies=''
         if self.status.startswith('3'):
@@ -19,13 +22,13 @@ class Response(object):
             return start_response.format_map(self.__dict__) + \
                 location_header.format_map(self.__dict__) + \
                 cookies + \
-                end_header.format_map(self.__dict__) + self.data + '\r\n\r\n'
+                end_response.format_map(self.__dict__) + self.data + '\r\n\r\n'
         if self.content_type is None:
             return start_response.format_map(self.__dict__) + \
                 cookies + \
-                end_header.format_map(self.__dict__)
+                end_response.format_map(self.__dict__) + "\r\n"
         return start_response.format_map(self.__dict__) + \
                 cookies + \
-                end_header.format_map(self.__dict__) + self.data + '\r\n\r\n'
+                end_response.format_map(self.__dict__) + self.data + '\r\n\r\n'
     __repr__ = __str__
 

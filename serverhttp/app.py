@@ -9,8 +9,7 @@ class App(object):
             return func
         return decorator
     def prepare_for_deploy(self, srv):
-        for attr in self.routes:
-            setattr(srv.functions, attr, self.routes[attr])
+        srv.functions.update(self.routes)
         srv.name = self.name
 Application = App
 

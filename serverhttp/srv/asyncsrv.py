@@ -37,10 +37,10 @@ class AsyncHTTPServer:
     >>> s = AsyncHTTPServer(app=app)
     >>> s.serve_forever("127.0.0.1", 60000)
     """
-    def __init__(self, name='', app=None, debug=False, sslcontext=None):
+    def __init__(self, name='', app=None, debug=True, sslcontext=None):
         self._debug_ = debug
         self.server = version
-        self.functions = object()
+        self.functions = dict()
         self.threads = []
         self.reply_format = reply_format
         if app:
@@ -71,8 +71,8 @@ class AsyncHTTPServer:
                     continue
                 req = Request(txt)
                 reply_obj = self._handle_request(req)
-                cookie='session-id:{}'.format(sid)
-                if len(reply_obj)==0:
+                cookie = 'session-id:{}'.format(sid)
+                if len(reply_obj.cookies)==0:
                     reply_obj.cookies = cookie
                 else:
                     reply_obj.cookies = reply_obj.cookies + ';' + cookie
@@ -86,17 +86,14 @@ class AsyncHTTPServer:
             writer.close()
             return
 
-    @asyncio.coroutine
     def _404(self, env):
-        yield Response('404 Not Found', 'text/html', '<h1>404 not found')
-    @asyncio.coroutine
+        return Response('404 Not Found', 'text/html', '<h1>404 not found')
     def _405(self, env):
-        yield Response('405 Method Not Allowed')
-    @asyncio.coroutine
+        return Response('405 Method Not Allowed')
     def _500(self, env):
-        yield Response("500 Server Error")
+        return Response("500 Server Error")
 
-    @asyncio.coroutine
+    #@asyncio.coroutine
     def _handle_request(self, request):
         splitted = request.text.split()
         env = get_environ(request)
@@ -105,21 +102,18 @@ class AsyncHTTPServer:
         except:
             path = splitted[1]
         method = splitted[0]
-        res = getattr(self.functions, path, self._404)
+        try:
+            res = self.functions[path]
+        except:
+            res = self._404
         try:
             res = res[method]
         except:
             if res == self._404:
                 pass
             else: res = self._405
-        if not asyncio.iscoroutine(res):
-            if self._debug_:
-                print("Error: function {} is not a coroutine".format(repr(res)))
-            else:
-                raise IsNotACoroutineError("function {} is not a coroutine".format(repr(res)))
-            res = self._500
         try:
-            res = yield from res(env)
+            res = res(env)
         except BaseException as e:
             if self._debug_:
                 i = StringIO()
@@ -131,7 +125,7 @@ class AsyncHTTPServer:
             else:
                 res = Response('500 Server Error', 'text/plain', '500 server error')
         return res
-    def init(self):
+    def init(self, host, port):
         loop = asyncio.get_event_loop()
         coro = asyncio.start_server(
             self._serve_one_client, 
@@ -140,7 +134,7 @@ class AsyncHTTPServer:
         srv = loop.run_until_complete(coro)
         return srv, loop
     def serve_forever(self, host, port):
-        srv, loop = self.init()
+        srv, loop = self.init(host, port)
         if self.name:
             print('* Serving App {}'.format(self.name))
         print('* Serving On http://{host}:{port}'.format(host=host, port=port))

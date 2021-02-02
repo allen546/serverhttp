@@ -46,7 +46,8 @@ class ThreadedHTTPServer:
         import time
         reply_format = self.reply_format
         timeout = 0.1
-        conn = self.sslcontext.wrap_socket(conn, server_side=True)
+        if self.sslcontext:
+            conn = self.sslcontext.wrap_socket(conn, server_side=True)
         while True:
             txt = conn.recv(65535).decode()
             if not txt:
@@ -59,7 +60,7 @@ class ThreadedHTTPServer:
             req = Request(txt)
             reply_obj = self._handle_request(req)
             cookie='session-id:{}'.format(sid)
-            if len(reply_obj)==0:
+            if len(reply_obj.cookies)==0:
                 reply_obj.cookies = cookie
             else:
                 reply_obj.cookies = reply_obj.cookies + ';' + cookie
@@ -72,7 +73,6 @@ class ThreadedHTTPServer:
         return Response('405 Method Not Allowed')
     def _handle_request(self, request):
         splitted = request.text.split()
-        print(splitted)
         env = get_environ(request)
         try:
             path = splitted[1].split('?')[0]
@@ -99,8 +99,7 @@ class ThreadedHTTPServer:
                 res = Response('500 Server Error', 'text/plain', '500 server error:\r\n'+d)
             else:
                 res = Response('500 Server Error', 'text/plain', '500 server error')
-        reply = str(res).encode()
-        return reply, res
+        return res
     def serve_forever(self, host, port):
         threads_append = self.threads.append
         import socket
