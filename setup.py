@@ -4,7 +4,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="serverhttp", 
-    version="1.5",
+    version="1.5.1",
     author="Allen",
     author_email="allen.haha@hotmail.com",
     description="A simple HTTP server",
@@ -15,5 +15,6 @@ setuptools.setup(
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.7',
+    install_requires=["asyncio"]
+    python_requires='>=3.3',
 )
