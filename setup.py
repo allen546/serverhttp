@@ -1,20 +1,22 @@
 import setuptools
+
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="serverhttp", 
-    version="1.6",
+    name="serverhttp", # Replace with your own username
+    version="1.6.1",
     author="Allen",
     author_email="allen.haha@hotmail.com",
-    description="A simple HTTP server",
+    description="A simple HTTP Server",
     long_description=long_description,
     long_description_content_type="text/markdown",
+    url="https://github.com/allen546/serverhttp",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    install_requires=["asyncio"],
     python_requires='>=3.3',
 )

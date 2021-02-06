@@ -1,5 +1,5 @@
 """
-Async HTTP Server.
+Asynchronous HTTP Server.
 """
 
 import datetime, time, threading
@@ -9,7 +9,7 @@ from ..http_support.formats import reply_format
 from ..http_support.parse_time import gettime as _gettime
 from ..http_support.environ import get_environ
 from .version import version
-import uuid
+import uuid, multiprocessing as mp
 from io import StringIO
 import traceback, sys
 if float(sys.version[:3]) < 3.3:
@@ -17,7 +17,7 @@ if float(sys.version[:3]) < 3.3:
 try:
     import asyncio
 except:
-    raise ImportError("Can't find module 'asyncio'."
+    raise ImportError("Can't find package 'asyncio'. "
                       "Make sure you have asyncio installed"
                       " before running this script again.")
 
@@ -31,18 +31,23 @@ class AsyncHTTPServer:
     Async HTTP Server that supports Asynchronous IO Coroutines.
     Note: AsyncHTTPServer Only supports python 3.3 and above. 
     For python 3.3, you'll need to install asyncio from PyPI.
+    Note: AsyncHTTPServer currently does not support running 
+    on multiple CPU Cores.
     Usage:
     >>> from serverhttp import *
     >>> app = App(__name__)
     >>> @coroutine
     @app.route("/", ["GET"])
     def test(environ):
-        yield Response("200 OK")
+        return Response("200 OK")
 
     >>> s = AsyncHTTPServer(app=app)
     >>> s.serve_forever("127.0.0.1", 60000)
     """
-    def __init__(self, name='', app=None, debug=True, sslcontext=None):
+    def __init__(self, name='', app=None, debug=True, sslcontext=None, 
+                 #multicore=True
+                 ):
+        # self.multicore = multicore
         self._debug_ = debug
         self.server = version
         self.functions = dict()
@@ -148,6 +153,7 @@ class AsyncHTTPServer:
             print('* Serving App {}'.format(self.name))
         print('* Serving On http://{host}:{port}'.format(host=host, port=port))
         print('* Press <CTRL-C> To Quit')
+        workers = []
         try:
             loop.run_forever()
         except KeyboardInterrupt:
@@ -156,4 +162,3 @@ class AsyncHTTPServer:
             loop.run_until_complete(srv.wait_closed())
             loop.close()
             pass
-
