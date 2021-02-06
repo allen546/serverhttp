@@ -14,7 +14,12 @@ from io import StringIO
 import traceback, sys
 if float(sys.version[:3]) < 3.3:
     raise DeprecationWarning('python {} deprecated'.format(sys.version[:5]))
-import asyncio
+try:
+    import asyncio
+except:
+    raise ImportError("Can't find module 'asyncio'."
+                      "Make sure you have asyncio installed"
+                      " before running this script again.")
 
 coroutine = asyncio.coroutine
 
@@ -23,8 +28,8 @@ class IsNotACoroutineError(Exception):
 
 class AsyncHTTPServer:
     """
-    Async HTTP Server.
-    Note: AsyncHTTPServer Only supported on python 3.3 and above. 
+    Async HTTP Server that supports Asynchronous IO Coroutines.
+    Note: AsyncHTTPServer Only supports python 3.3 and above. 
     For python 3.3, you'll need to install asyncio from PyPI.
     Usage:
     >>> from serverhttp import *
@@ -70,7 +75,7 @@ class AsyncHTTPServer:
                         break
                     continue
                 req = Request(txt)
-                reply_obj = self._handle_request(req)
+                reply_obj = yield from self._handle_request(req)
                 cookie = 'session-id:{}'.format(sid)
                 if len(reply_obj.cookies)==0:
                     reply_obj.cookies = cookie
@@ -82,10 +87,11 @@ class AsyncHTTPServer:
                 yield from writer.drain()
             writer.close()
             return
-        except:
+        except KeyboardInterrupt:
             writer.close()
             return
 
+    # Server's default exception handler coroutines
     def _404(self, env):
         return Response('404 Not Found', 'text/html', '<h1>404 not found')
     def _405(self, env):
@@ -93,7 +99,7 @@ class AsyncHTTPServer:
     def _500(self, env):
         return Response("500 Server Error")
 
-    #@asyncio.coroutine
+    @asyncio.coroutine
     def _handle_request(self, request):
         splitted = request.text.split()
         env = get_environ(request)
@@ -113,7 +119,9 @@ class AsyncHTTPServer:
                 pass
             else: res = self._405
         try:
-            res = res(env)
+            if asyncio.iscoroutine(res):
+                res = yield from res(env)
+            else: res = res(env)
         except BaseException as e:
             if self._debug_:
                 i = StringIO()
@@ -135,6 +143,7 @@ class AsyncHTTPServer:
         return srv, loop
     def serve_forever(self, host, port):
         srv, loop = self.init(host, port)
+        print()
         if self.name:
             print('* Serving App {}'.format(self.name))
         print('* Serving On http://{host}:{port}'.format(host=host, port=port))
@@ -142,7 +151,7 @@ class AsyncHTTPServer:
         try:
             loop.run_forever()
         except KeyboardInterrupt:
-            print('Shutting Down...')
+            print()
             srv.close()
             loop.run_until_complete(srv.wait_closed())
             loop.close()
