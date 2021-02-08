@@ -9,7 +9,7 @@ from ..http_support.formats import reply_format
 from ..http_support.parse_time import gettime as _gettime
 from ..http_support.environ import get_environ
 from .version import version
-import uuid, multiprocessing as mp
+import uuid
 from io import StringIO
 import traceback, sys
 if float(sys.version[:3]) < 3.3:
@@ -44,9 +44,10 @@ class AsyncHTTPServer:
     >>> s = AsyncHTTPServer(app=app)
     >>> s.serve_forever("127.0.0.1", 60000)
     """
-    def __init__(self, name='', app=None, debug=True, sslcontext=None, 
-                 #multicore=True
-                 ):
+    use_ipv6 = False
+    def __init__(self, name='', app=None, debug=True, sslcontext=None,
+    			# multicore=False,
+				):
         # self.multicore = multicore
         self._debug_ = debug
         self.server = version
@@ -61,7 +62,7 @@ class AsyncHTTPServer:
         else:
             self.name = name
         self.sslcontext = sslcontext
-    
+        
     @asyncio.coroutine
     def _serve_one_client(self, reader, writer):
         import time
@@ -161,4 +162,3 @@ class AsyncHTTPServer:
             srv.close()
             loop.run_until_complete(srv.wait_closed())
             loop.close()
-            pass

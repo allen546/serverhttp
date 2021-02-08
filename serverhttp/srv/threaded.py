@@ -26,7 +26,10 @@ class ThreadedHTTPServer:
     >>> s = ThreadedHTTPServer(app=app)
     >>> s.serve_forever("127.0.0.1", 60000)
     """
-    def __init__(self, name='', app=None, max_threads=2000, debug=False, sslcontext=None):
+    use_ipv6 = False
+    def __init__(self, name='', app=None, max_threads=2000, debug=False, 
+    		sslcontext=None, 
+    		):
         self.server = version
         self.functions = {}
         self.threads = []
@@ -40,7 +43,11 @@ class ThreadedHTTPServer:
             self.app.prepare_for_deploy(self)
         else:
             self.name = name
-        self.sslcontext=sslcontext
+        self.sslcontext = sslcontext
+        self._address_family = socket.AF_INET
+        if self.use_ipv6:
+        	self._address_family = socket.AF_INET6
+        	
     def _serve_one_client(self, conn, addr):
         sid = uuid.uuid4().hex
         import time
@@ -103,7 +110,7 @@ class ThreadedHTTPServer:
     def serve_forever(self, host, port):
         threads_append = self.threads.append
         import socket
-        s = socket.socket()
+        s = socket.socket(self._address_family)
         s.bind((host, port))
         if self.name != '':
             print('* Serving App {}'.format(self.name))

@@ -12,4 +12,4 @@ from .app import *
 from .srv import *
 from .http_support.responses import *
 
-__version__ = 1.5
+__version__ = 1.6.2

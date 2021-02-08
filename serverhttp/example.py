@@ -1,6 +1,6 @@
 from serverhttp import *
 app_resp = '''\
-<?xml version="1.0">
+<?xml version="1.0"?>
 <text>Hello World!</text>'''
 demo_app = app.App('demo')
 #@coroutine
