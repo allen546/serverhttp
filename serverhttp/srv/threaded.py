@@ -12,6 +12,9 @@ from .version import version
 import uuid
 from io import StringIO
 import traceback
+
+__all__ = ("ThreadedHTTPServer",)
+
 class ThreadedHTTPServer:
     """
     Threaded HTTP Server.

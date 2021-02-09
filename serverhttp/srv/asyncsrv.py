@@ -21,6 +21,8 @@ except:
                       "Make sure you have asyncio installed"
                       " before running this script again.")
 
+__all__ = ("AsyncHTTPServer",)
+
 coroutine = asyncio.coroutine
 
 class IsNotACoroutineError(Exception):

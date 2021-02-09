@@ -1,3 +1,6 @@
+
+__all__ = ("Application", "App")
+
 class App(object):
     def __init__(self, name):
         self.name = name
@@ -11,5 +14,7 @@ class App(object):
     def prepare_for_deploy(self, srv):
         srv.functions.update(self.routes)
         srv.name = self.name
+        
 Application = App
+
 
